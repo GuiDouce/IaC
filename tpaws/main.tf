@@ -23,3 +23,14 @@ provider "aws" {
     ec2 = "http://localhost:4566"
   }
 }
+
+resource "aws_instance" "db" {
+  ami             = "ami-12345678"
+  instance_type   = var.instance_type
+  security_groups = [aws_security_group.web.name] # On peut réutiliser le même SG pour l'instant
+  key_name        = aws_key_pair.deployer.key_name
+
+  tags = {
+    Name = "var.db_instance_name"
+  }
+}

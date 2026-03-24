@@ -17,3 +17,8 @@ variable "http_port" {
   type    = number
   default = 80
 }
+
+variable "db_instance_name" {
+  type    = string
+  default = "database-server"
+}
