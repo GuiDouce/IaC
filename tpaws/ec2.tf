@@ -15,18 +15,27 @@ resource "local_file" "private_key" {
 }
 
 resource "aws_instance" "web" {
-  ami             = "ami-0c101f26f147fa7fd"
-  instance_type   = var.instance_type
+  ami                    = "ami-0c101f26f147fa7fd"
+  instance_type          = var.instance_type
   vpc_security_group_ids = [aws_security_group.web.id]
-  key_name        = aws_key_pair.deployer.key_name
+  key_name               = aws_key_pair.deployer.key_name
 
   user_data = <<-EOF
               #!/bin/bash
               yum update -y
-              amazon-linux-extras install -y nginx1
-              systemctl start nginx
-              systemctl enable nginx
-              echo "<h1>Hello from Terraform and AWS!</h1>" > /usr/share/nginx/html/index.html
+              yum install -y docker git
+              
+              systemctl start docker
+              systemctl enable docker
+              usermod -aG docker ec2-user
+
+              cd /home/ec2-user
+              git clone https://github.com/Jules-u/Workshop.git
+              cd Workshop
+
+              docker build -t workshop-app .
+              
+              docker run -d -p 80:80 --name workshop-container workshop-app
               EOF
 
   tags = {
